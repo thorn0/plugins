@@ -25,7 +25,7 @@ import {
   PROXY_SUFFIX,
   unwrapId
 } from './helpers';
-import { setIsCjsPromise } from './is-cjs';
+import { IsCjsPromiseMap } from './is-cjs';
 import { hasCjsKeywords } from './parse';
 import {
   getDynamicJsonProxy,
@@ -72,7 +72,7 @@ export default function commonjs(options = {}) {
 
   const esModulesWithDefaultExport = new Set();
   const esModulesWithNamedExports = new Set();
-  const isCjsPromises = new Map();
+  const isCjsPromiseMap = new IsCjsPromiseMap();
 
   const ignoreRequire =
     typeof options.ignore === 'function'
@@ -210,7 +210,7 @@ export default function commonjs(options = {}) {
           getRequireReturnsDefault(actualId),
           esModulesWithDefaultExport,
           esModulesWithNamedExports,
-          isCjsPromises
+          isCjsPromiseMap
         );
       }
 
@@ -246,11 +246,11 @@ export default function commonjs(options = {}) {
       if (commonjs) {
         const isCjs = commonjs.isCommonJS;
         if (isCjs != null) {
-          setIsCjsPromise(isCjsPromises, id, isCjs);
+          isCjsPromiseMap.set(id, isCjs);
           return;
         }
       }
-      setIsCjsPromise(isCjsPromises, id, null);
+      isCjsPromiseMap.set(id, null);
     }
   };
 }

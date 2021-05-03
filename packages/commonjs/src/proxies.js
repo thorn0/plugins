@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 
 import { DYNAMIC_JSON_PREFIX, HELPERS_ID } from './helpers';
-import { getIsCjsPromise } from './is-cjs';
 import { getName, getVirtualPathForDynamicRequirePath, normalizePathSlashes } from './utils';
 
 // e.g. id === "commonjsHelpers?commonjsRegister"
@@ -47,10 +46,10 @@ export async function getStaticRequireProxy(
   requireReturnsDefault,
   esModulesWithDefaultExport,
   esModulesWithNamedExports,
-  isCjsPromises
+  isCjsPromiseMap
 ) {
   const name = getName(id);
-  const isCjs = await getIsCjsPromise(isCjsPromises, id);
+  const isCjs = await isCjsPromiseMap.get(id);
   if (isCjs) {
     return `import { __moduleExports } from ${JSON.stringify(id)}; export default __moduleExports;`;
   } else if (isCjs === null) {

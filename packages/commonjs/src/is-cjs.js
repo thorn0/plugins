@@ -1,27 +1,33 @@
-export function getIsCjsPromise(isCjsPromises, id) {
-  let isCjsPromise = isCjsPromises.get(id);
-  if (isCjsPromise) return isCjsPromise.promise;
+export class IsCjsPromiseMap {
+  constructor() {
+    this.map = new Map();
+  }
 
-  const promise = new Promise((resolve) => {
-    isCjsPromise = {
-      resolve,
-      promise: null
-    };
-    isCjsPromises.set(id, isCjsPromise);
-  });
-  isCjsPromise.promise = promise;
+  get(id) {
+    let mapEntry = this.map.get(id);
+    if (mapEntry) return mapEntry.promise;
 
-  return promise;
-}
+    const promise = new Promise((resolve) => {
+      mapEntry = {
+        resolve,
+        promise: null
+      };
+      this.map.set(id, mapEntry);
+    });
+    mapEntry.promise = promise;
 
-export function setIsCjsPromise(isCjsPromises, id, resolution) {
-  const isCjsPromise = isCjsPromises.get(id);
-  if (isCjsPromise) {
-    if (isCjsPromise.resolve) {
-      isCjsPromise.resolve(resolution);
-      isCjsPromise.resolve = null;
+    return promise;
+  }
+
+  set(id, resolution) {
+    const mapEntry = this.map.get(id);
+    if (mapEntry) {
+      if (mapEntry.resolve) {
+        mapEntry.resolve(resolution);
+        mapEntry.resolve = null;
+      }
+    } else {
+      this.map.set(id, { promise: Promise.resolve(resolution), resolve: null });
     }
-  } else {
-    isCjsPromises.set(id, { promise: Promise.resolve(resolution), resolve: null });
   }
 }
